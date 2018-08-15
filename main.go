@@ -22,17 +22,14 @@ package main
 // }
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/ant0ine/go-json-rest/rest"
+	"rutgo/serve"
 )
 
 func main() {
-	api := rest.NewApi()
-	api.Use(rest.DefaultDevStack...)
-	api.SetApp(rest.AppSimple(func(w rest.ResponseWriter, r *rest.Request) {
+	api := serve.NewServe()
+	// api.Use(rest.DefaultDevStack...)
+	api.SetApp(serve.AppSimple(func(w serve.ResponseWriter, r *serve.Request) {
 		w.WriteJson(map[string]string{"Body": "Hello World!"})
 	}))
-	log.Fatal(http.ListenAndServe(":8000", api.MakeHandler()))
+	api.Run(":5000")
 }
