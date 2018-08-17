@@ -14,9 +14,9 @@ import (
 // Note, the responseWriter object instantiated by the framework also implements many other interfaces
 // accessible by type assertion: http.ResponseWriter, http.Flusher, http.CloseNotifier, http.Hijacker.
 type ResponseWriter interface {
-
+	http.ResponseWriter
 	// Identical to the http.ResponseWriter interface
-	Header() http.Header
+	// Header() http.Header
 
 	// Use EncodeJson to generate the payload, write the headers with http.StatusOK if
 	// they are not already written, then write the payload.
@@ -29,7 +29,7 @@ type ResponseWriter interface {
 
 	// Similar to the http.ResponseWriter interface, with additional JSON related
 	// headers set.
-	WriteHeader(int)
+	// WriteHeader(int)
 }
 
 // ErrorFieldName allows to customize the field name used in the error response payload.
