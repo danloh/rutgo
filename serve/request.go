@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2016 Antoine Imbert
+// The MIT License: https://github.com/ant0ine/go-json-rest/blob/master/LICENSE
+
 // inherit from http.Request
 // to add additional method
 

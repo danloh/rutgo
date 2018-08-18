@@ -23,22 +23,22 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"rutgo/serve"
 )
 
-func index(w http.ResponseWriter, r *http.Request, _ serve.Params) {
+func index(w serve.ResponseWriter, r *serve.Request, _ serve.Params) {
 	fmt.Fprint(w, "Welcome!\n")
 }
 
-//func jsn(w http.ResponseWriter, r *http.Request, _ serve.Params) {
-//	w.WriteJson(map[string]string{'geret': 'hello world'})
-//}
+func sayHi(w serve.ResponseWriter, r *serve.Request, _ serve.Params) {
+	w.WriteJson(map[string]string{"say": "hello world"})
+}
 
 func main() {
 	api := serve.NewServe()
 	// api.Use(rest.DefaultDevStack...)
+	// api.Handle("GET", "/", index)
 	api.GET("/", index)
-	// api.GET("/geret", jsn)
+	api.GET("/hi", sayHi)
 	api.Run(":8080")
 }

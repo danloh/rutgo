@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2016 Antoine Imbert
+// The MIT License: https://github.com/ant0ine/go-json-rest/blob/master/LICENSE
+
 // handler, middleware
 
 package serve
@@ -6,42 +9,31 @@ import (
 	"net/http"
 )
 
-// HandlerFunc defines the handler function. It is the go-json-rest equivalent of http.HandlerFunc.
-type HandlerFunc func(ResponseWriter, *Request)
+// Handle jus like http.HandlerFunc,
+// add  third parameter for the values of wildcards (variables).
+// no wrap
+type Handle func(http.ResponseWriter, *http.Request, Params)
 
-// App defines the interface that an object should implement to be used as an app in this framework
-// stack. The App is the top element of the stack, the other elements being middlewares.
-type App interface {
-	AppFunc() HandlerFunc
-}
+// HandlerFunc defines the handler function.
+// using the inherited ResponseWriter and Request, Wrapped
+// and add a third param
+type HandlerFunc func(ResponseWriter, *Request, Params)
 
-// AppSimple is an adapter type that makes it easy to write an App with a simple function.
-// eg: rest.NewApi(rest.AppSimple(func(w rest.ResponseWriter, r *rest.Request) { ... }))
-type AppSimple HandlerFunc
-
-// AppFunc makes AppSimple implement the App interface.
-func (as AppSimple) AppFunc() HandlerFunc {
-	return HandlerFunc(as)
-}
-
-// Middleware defines the interface that objects must implement in order to wrap a HandlerFunc and
-// be used in the middleware stack.
+// Middleware defines the interface to wrap a HandlerFunc, like decorator
 type Middleware interface {
 	MiddlewareFunc(handler HandlerFunc) HandlerFunc
 }
 
-// MiddlewareSimple is an adapter type that makes it easy to write a Middleware with a simple
-// function. eg: api.Use(rest.MiddlewareSimple(func(h HandlerFunc) Handlerfunc { ... }))
-type MiddlewareSimple func(handler HandlerFunc) HandlerFunc
+// MiddleFunc is is to MiddleWare just what http.HandlerFunc is to http.Handler
+type MiddleFunc func(handler HandlerFunc) HandlerFunc
 
-// MiddlewareFunc makes MiddlewareSimple implement the Middleware interface.
-func (ms MiddlewareSimple) MiddlewareFunc(handler HandlerFunc) HandlerFunc {
-	return ms(handler)
+// MiddlewareFunc makes MiddleFunc implement the Middleware interface.
+func (mf MiddleFunc) MiddlewareFunc(handler HandlerFunc) HandlerFunc {
+	return mf(handler)
 }
 
-// WrapMiddlewares calls the MiddlewareFunc methods in the reverse order and returns an HandlerFunc
-// ready to be executed. This can be used to wrap a set of middlewares, post routing, on a per Route
-// basis.
+// WrapMiddlewares to wrap a set of middlewares
+// calls the MiddlewareFunc methods in the reverse order
 func WrapMiddlewares(middlewares []Middleware, handler HandlerFunc) HandlerFunc {
 	wrapped := handler
 	for i := len(middlewares) - 1; i >= 0; i-- {
@@ -50,25 +42,24 @@ func WrapMiddlewares(middlewares []Middleware, handler HandlerFunc) HandlerFunc 
 	return wrapped
 }
 
-// Handle the transition between net/http and go-json-rest objects.
-// It intanciates the rest.Request and rest.ResponseWriter, ...
-func adapterFunc(handler HandlerFunc) http.HandlerFunc {
+// AdapterFunc Handle the transition serve.HandlerFunc TO serve.Handle
+func AdapterFunc(handler HandlerFunc) Handle {
 
-	return func(origWriter http.ResponseWriter, origRequest *http.Request) {
+	return func(origW http.ResponseWriter, origReq *http.Request, ps Params) {
 
 		// instantiate the rest objects
 		request := &Request{
-			origRequest,
+			origReq,
 			nil,
 			map[string]interface{}{},
 		}
 
 		writer := &responseWriter{
-			origWriter,
+			origW,
 			false,
 		}
 
 		// call the wrapped handler
-		handler(writer, request)
+		handler(writer, request, ps)
 	}
 }

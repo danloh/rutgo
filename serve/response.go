@@ -1,3 +1,6 @@
+// Copyright (c) 2013-2016 Antoine Imbert
+// The MIT License: https://github.com/ant0ine/go-json-rest/blob/master/LICENSE
+
 // inherit from http.Response
 // to add additional method
 
@@ -14,9 +17,9 @@ import (
 // Note, the responseWriter object instantiated by the framework also implements many other interfaces
 // accessible by type assertion: http.ResponseWriter, http.Flusher, http.CloseNotifier, http.Hijacker.
 type ResponseWriter interface {
-	http.ResponseWriter
+	// http.ResponseWriter
 	// Identical to the http.ResponseWriter interface
-	// Header() http.Header
+	Header() http.Header
 
 	// Use EncodeJson to generate the payload, write the headers with http.StatusOK if
 	// they are not already written, then write the payload.
@@ -27,9 +30,12 @@ type ResponseWriter interface {
 	// middlewares.
 	EncodeJson(v interface{}) ([]byte, error)
 
+	// Smilar to the http.ResponseWrite
+	Write([]byte) (int, error)
+
 	// Similar to the http.ResponseWriter interface, with additional JSON related
 	// headers set.
-	// WriteHeader(int)
+	WriteHeader(int)
 }
 
 // ErrorFieldName allows to customize the field name used in the error response payload.

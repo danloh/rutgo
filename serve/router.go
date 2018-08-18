@@ -81,44 +81,39 @@ func NewRouter() *Router {
 // #### URL Handle ###
 // ###################
 
-// Handle is a function that can be registered to a route to handle HTTP
-// requests. Like http.HandlerFunc, but has a third parameter for the values of
-// wildcards (variables).
-type Handle func(http.ResponseWriter, *http.Request, Params)
-
-// GET is a shortcut for router.Handle("GET", path, handle)
-func (r *Router) GET(path string, handle Handle) {
-	r.Handle("GET", path, handle)
+// GET is a shortcut for router.HandleWrapped("GET", path, handle)
+func (r *Router) GET(path string, handler HandlerFunc) {
+	r.HandleWrapped("GET", path, handler)
 }
 
-// HEAD is a shortcut for router.Handle("HEAD", path, handle)
-func (r *Router) HEAD(path string, handle Handle) {
-	r.Handle("HEAD", path, handle)
+// HEAD is a shortcut for router.HandleWrapped("HEAD", path, handle)
+func (r *Router) HEAD(path string, handler HandlerFunc) {
+	r.HandleWrapped("HEAD", path, handler)
 }
 
-// OPTIONS is a shortcut for router.Handle("OPTIONS", path, handle)
-func (r *Router) OPTIONS(path string, handle Handle) {
-	r.Handle("OPTIONS", path, handle)
+// OPTIONS is a shortcut for router.HandleWrapped("OPTIONS", path, handle)
+func (r *Router) OPTIONS(path string, handler HandlerFunc) {
+	r.HandleWrapped("OPTIONS", path, handler)
 }
 
-// POST is a shortcut for router.Handle("POST", path, handle)
-func (r *Router) POST(path string, handle Handle) {
-	r.Handle("POST", path, handle)
+// POST is a shortcut for router.HandleWrapped("POST", path, handle)
+func (r *Router) POST(path string, handler HandlerFunc) {
+	r.HandleWrapped("POST", path, handler)
 }
 
-// PUT is a shortcut for router.Handle("PUT", path, handle)
-func (r *Router) PUT(path string, handle Handle) {
-	r.Handle("PUT", path, handle)
+// PUT is a shortcut for router.HandleWrapped("PUT", path, handle)
+func (r *Router) PUT(path string, handler HandlerFunc) {
+	r.HandleWrapped("PUT", path, handler)
 }
 
-// PATCH is a shortcut for router.Handle("PATCH", path, handle)
-func (r *Router) PATCH(path string, handle Handle) {
-	r.Handle("PATCH", path, handle)
+// PATCH is a shortcut for router.HandleWrapped("PATCH", path, handle)
+func (r *Router) PATCH(path string, handler HandlerFunc) {
+	r.HandleWrapped("PATCH", path, handler)
 }
 
-// DELETE is a shortcut for router.Handle("DELETE", path, handle)
-func (r *Router) DELETE(path string, handle Handle) {
-	r.Handle("DELETE", path, handle)
+// DELETE is a shortcut for router.HandleWrapped("DELETE", path, handle)
+func (r *Router) DELETE(path string, handler HandlerFunc) {
+	r.HandleWrapped("DELETE", path, handler)
 }
 
 // Handle registers a new request handle with the given path and method.
@@ -143,8 +138,12 @@ func (r *Router) Handle(method, path string, handle Handle) {
 		root = new(node)
 		r.trees[method] = root
 	}
-
 	root.addRoute(path, handle)
+}
+
+// HandleWrapped to Handle the wrapped HandlerFunc
+func (r *Router) HandleWrapped(method, path string, handler HandlerFunc) {
+	r.Handle(method, path, AdapterFunc(handler))
 }
 
 // Handler is an adapter which allows the usage of an http.Handler as a
@@ -184,7 +183,7 @@ func (r *Router) ServeFiles(path string, root http.FileSystem) {
 
 	fileServer := http.FileServer(root)
 
-	r.GET(path, func(w http.ResponseWriter, req *http.Request, ps Params) {
+	r.Handle("GET", path, func(w http.ResponseWriter, req *http.Request, ps Params) {
 		req.URL.Path = ps.ByName("filepath")
 		fileServer.ServeHTTP(w, req)
 	})
