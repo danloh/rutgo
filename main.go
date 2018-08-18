@@ -70,7 +70,7 @@ func main() {
 	api.Use(&MidOne{}) // galoble mid
 	// api.Handle("GET", "/", index)
 	api.GET("/", index)
-	midHi := serve.WrapMiddlewares(chainM, sayHi)
+	midHi := serve.WrapMws(chainM, sayHi)
 	api.GET("/hi", midHi)
 	api.GET("/hi/:name", hello)
 	api.Run(":8080")

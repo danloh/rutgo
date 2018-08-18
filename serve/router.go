@@ -147,7 +147,7 @@ func (r *Router) Handle(method, path string, handle Handle) {
 // HandleWrapped to Handle the wrapped HandlerFunc
 func (r *Router) HandleWrapped(method, path string, handler HandlerFunc) {
 	// use global middleware
-	handlerFunc := WrapMiddlewares(r.GlobalMiddle, handler)
+	handlerFunc := WrapMws(r.GlobalMiddle, handler)
 	r.Handle(method, path, AdapterFunc(handlerFunc))
 }
 

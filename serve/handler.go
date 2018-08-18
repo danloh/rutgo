@@ -32,9 +32,9 @@ func (mf MiddleFunc) MiddlewareFunc(handler HandlerFunc) HandlerFunc {
 	return mf(handler)
 }
 
-// WrapMiddlewares to wrap a set of middlewares
+// WrapMws to wrap a set of middlewares
 // calls the MiddlewareFunc methods in the reverse order
-func WrapMiddlewares(middlewares []Middleware, handler HandlerFunc) HandlerFunc {
+func WrapMws(middlewares []Middleware, handler HandlerFunc) HandlerFunc {
 	wrapped := handler
 	for i := len(middlewares) - 1; i >= 0; i-- {
 		wrapped = middlewares[i].MiddlewareFunc(wrapped)

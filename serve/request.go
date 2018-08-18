@@ -37,6 +37,7 @@ func (r *Request) PathParam(name string) string {
 }
 
 // DecodeJSONPayload reads the request body and decodes the JSON using json.Unmarshal.
+// store data to v
 func (r *Request) DecodeJSONPayload(v interface{}) error {
 	content, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
@@ -46,7 +47,7 @@ func (r *Request) DecodeJSONPayload(v interface{}) error {
 	if len(content) == 0 {
 		return ErrJSONPayloadEmpty
 	}
-	err = json.Unmarshal(content, v)
+	err = json.Unmarshal(content, v) // store json-data to v
 	if err != nil {
 		return err
 	}
@@ -95,7 +96,7 @@ func (r *Request) URLFor(path string, queryParams map[string][]string) *url.URL 
 	return baseURL
 }
 
-// CorsInfo contains the CORS request info derived from a rest.Request.
+// CorsInfo contains the CORS request info derived from a s.Request.
 type CorsInfo struct {
 	IsCors      bool
 	IsPreflight bool

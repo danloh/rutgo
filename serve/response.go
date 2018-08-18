@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2016 Antoine Imbert
 // The MIT License: https://github.com/ant0ine/go-json-rest/blob/master/LICENSE
 
-// inherit from http.Response
+// inherit from http.ResponseWriter
 // to add additional method
 
 package serve
@@ -13,9 +13,7 @@ import (
 	"net/http"
 )
 
-// A ResponseWriter interface dedicated to JSON HTTP response.
-// Note, the responseWriter object instantiated by the framework also implements many other interfaces
-// accessible by type assertion: http.ResponseWriter, http.Flusher, http.CloseNotifier, http.Hijacker.
+// ResponseWriter interface dedicated to JSON HTTP response.
 type ResponseWriter interface {
 	// http.ResponseWriter
 	// Identical to the http.ResponseWriter interface
@@ -40,10 +38,11 @@ type ResponseWriter interface {
 
 // ErrorFieldName allows to customize the field name used in the error response payload.
 // It defaults to "Error" for compatibility reason, but can be changed before starting the server.
-// eg: rest.ErrorFieldName = "errorMessage"
+// eg: s.ErrorFieldName = "errorMessage"
 var ErrorFieldName = "Error"
 
-// Error produces an error response in JSON with the following structure, '{"Error":"My error message"}'
+// Error produces an error response in JSON with the following structure:
+// '{"Error":"My error message"}'
 // The standard plain text net/http Error helper can still be called like this:
 // http.Error(w, "error message", code)
 func Error(w ResponseWriter, error string, code int) {
@@ -54,7 +53,8 @@ func Error(w ResponseWriter, error string, code int) {
 	}
 }
 
-// NotFound produces a 404 response with the following JSON, '{"Error":"Resource not found"}'
+// NotFound produces a 404 response with the following JSON:
+//  '{"Error":"Resource not found"}'
 // The standard plain text net/http NotFound helper can still be called like this:
 // http.NotFound(w, r.Request)
 func NotFound(w ResponseWriter, r *Request) {
