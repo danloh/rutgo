@@ -23,6 +23,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"rutgo/serve"
 )
 
@@ -33,12 +34,44 @@ func index(w serve.ResponseWriter, r *serve.Request, _ serve.Params) {
 func sayHi(w serve.ResponseWriter, r *serve.Request, _ serve.Params) {
 	w.WriteJson(map[string]string{"say": "hello world"})
 }
+func hello(w serve.ResponseWriter, r *serve.Request, ps serve.Params) {
+	w.WriteJson(map[string]string{"Hello": ps.ByName("name")})
+}
+
+// MidOne a middleware
+type MidOne struct{}
+
+// MiddlewareFunc is MiddleWare
+func (one *MidOne) MiddlewareFunc(handler serve.HandlerFunc) serve.HandlerFunc {
+	return serve.HandlerFunc(func(w serve.ResponseWriter, r *serve.Request, ps serve.Params) {
+		log.Printf("first mid")
+		handler(w, r, ps)
+	})
+}
+
+// MidTwo a middleware
+type MidTwo struct{}
+
+// MiddlewareFunc is MiddleWare
+func (two *MidTwo) MiddlewareFunc(handler serve.HandlerFunc) serve.HandlerFunc {
+	return serve.HandlerFunc(func(w serve.ResponseWriter, r *serve.Request, ps serve.Params) {
+		log.Printf("second mid")
+		handler(w, r, ps)
+	})
+}
+
+var chainM = []serve.Middleware{
+	&MidOne{},
+	&MidTwo{},
+}
 
 func main() {
 	api := serve.NewServe()
-	// api.Use(rest.DefaultDevStack...)
+	api.Use(&MidOne{}) // galoble mid
 	// api.Handle("GET", "/", index)
 	api.GET("/", index)
-	api.GET("/hi", sayHi)
+	midHi := serve.WrapMiddlewares(chainM, sayHi)
+	api.GET("/hi", midHi)
+	api.GET("/hi/:name", hello)
 	api.Run(":8080")
 }

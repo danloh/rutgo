@@ -24,6 +24,7 @@ func NewServe() *Serve {
 // Use pushes one or multiple middlewares to the stack
 func (srv *Serve) Use(middlewares ...Middleware) {
 	srv.stack = append(srv.stack, middlewares...)
+	srv.Router.GlobalMiddle = srv.stack
 }
 
 // Run to start serve

@@ -14,6 +14,9 @@ import (
 type Router struct {
 	trees map[string]*node
 
+	// Enable global middlewares
+	GlobalMiddle []Middleware
+
 	// Enables automatic redirection if the current route can't be matched but a
 	// handler for the path with (without) the trailing slash exists.
 	// For example if /foo/ is requested but a route only exists for /foo, the
@@ -143,7 +146,9 @@ func (r *Router) Handle(method, path string, handle Handle) {
 
 // HandleWrapped to Handle the wrapped HandlerFunc
 func (r *Router) HandleWrapped(method, path string, handler HandlerFunc) {
-	r.Handle(method, path, AdapterFunc(handler))
+	// use global middleware
+	handlerFunc := WrapMiddlewares(r.GlobalMiddle, handler)
+	r.Handle(method, path, AdapterFunc(handlerFunc))
 }
 
 // Handler is an adapter which allows the usage of an http.Handler as a
