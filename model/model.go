@@ -6,10 +6,8 @@ package model
 type User struct {
 	ID    int    `json:"id,omitempty"`
 	Name  string `json:"name"`
+	Pswmd string `json:"pswmd,omitempty"`
 	Email string `json:"email"`
-	Pwd   string `json:"pwd,omitempty"`
-	Role  string `json:"role"`
-	Intro string `json:"intro"`
 }
 
 // Poem item
