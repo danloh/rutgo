@@ -18,7 +18,7 @@ func NewUser(name, psw, email string) error {
 		return err
 	}
 	pswMd := util.Cipher(psw)
-	uid := util.GenUID()
+	uid := util.GenSID()
 	_, err = stmtNew.Exec(name, pswMd, email, uid)
 	if err != nil {
 		return err
