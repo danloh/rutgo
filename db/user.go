@@ -5,14 +5,13 @@ package db
 import (
 	"database/sql"
 	"log"
-	"rutgo/model"
 	"rutgo/util"
 )
 
 // NewUser POST
 func NewUser(name, psw, email string) error {
 	stmtNew, err := db.Prepare(
-		"INSERT INTO user (name, pswmd, email) VALUES (?,?,?)")
+		"INSERT INTO user (name, pswmd, email, uid) VALUES (?,?,?,?)")
 	defer stmtNew.Close()
 	if err != nil {
 		return err
@@ -32,7 +31,7 @@ func UpdateUser() error {
 }
 
 // GetUser GET
-func GetUser(uid, name string) (*model.User, error) {
+func GetUser(uid, name string) (*User, error) {
 	stmtGet, err := db.Prepare(
 		"SELECT (name, email, uid) FROM user WHERE uid = ? or name = ?")
 	defer stmtGet.Close()
@@ -48,7 +47,7 @@ func GetUser(uid, name string) (*model.User, error) {
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	res := &model.User{ID: 0, Pswmd: "nil", Name: name, Email: email, UID: uid}
+	res := &User{ID: 0, Pswmd: "nil", Name: name, Email: email, UID: uid}
 
 	return res, nil
 }
